@@ -10,7 +10,7 @@ using Microsoft.Xna.Framework.Input;
 
 namespace MonoGameWindowsStarter
 {
-    public class PlayerBullet
+    public class PlayerBullet: CollidableObject
     {
         Game1 game;
         Texture2D texture;
@@ -20,6 +20,7 @@ namespace MonoGameWindowsStarter
         Vector2 newDestination;
         bool isVisible = true;
         bool exploded = false;
+        Grid grid;
         TimeSpan animationTimer, explodedTimer, trailTimer;
         const int FRAME_WIDTH = 296 , FRAME_HEIGHT = 260, ANIMATION_FRAME_RATE = 124;
         int frame, state;
@@ -29,13 +30,18 @@ namespace MonoGameWindowsStarter
         {
             get { return isVisible; }
         }
-        public PlayerBullet(Game1 game, int xBounds, int yBounds, float rotation, Vector2 destination,  PlayerBulletModel playerBulletModel)
+        public override Rectangle RectBounds()
+        {
+            return (Rectangle)bounds;
+        }
+        public PlayerBullet(Game1 game, int xBounds, int yBounds, float rotation, Vector2 destination,  PlayerBulletModel playerBulletModel, Grid grid)
         {
             this.game = game;
             this.destination = destination;
             this.rotation = rotation;
             bounds.X = xBounds;
             bounds.Y = yBounds;
+            this.grid = grid;
             LoadContent(playerBulletModel);
         }
         public void LoadContent(PlayerBulletModel playerBulletModel)
@@ -44,12 +50,13 @@ namespace MonoGameWindowsStarter
             bounds.Height = 20;
             texture = playerBulletModel.Texture;
             explodedTexture = playerBulletModel.ExplodedTexture;
+            grid.Add(this, new Vector2(bounds.X, bounds.Y));
         }
 
         public void Update(GameTime gameTime)
         {
             //trailTimer += gameTime.ElapsedGameTime;
-            
+            Vector2 oldLocation = new Vector2(bounds.X, bounds.Y);
             
             if(!exploded)
             {
@@ -73,7 +80,7 @@ namespace MonoGameWindowsStarter
                     bounds.Width = 128;
                     bounds.Height = 128;
                 }
-                
+
             }
             else
             {
@@ -98,8 +105,20 @@ namespace MonoGameWindowsStarter
                 }
                 frame %= 1;
             }
+            grid.Move(this, oldLocation, new Vector2(bounds.X, bounds.Y));
+
         }
      
+        public override void handleCollision(CollidableObject collidedObject)
+        {
+            if(collidedObject.GetType() == typeof(EnemyBullet))
+            {
+                exploded = true;
+                bounds.Width = 128;
+                bounds.Height = 128;
+            }
+
+        }
            
         public void Draw(SpriteBatch spriteBatch)
         {

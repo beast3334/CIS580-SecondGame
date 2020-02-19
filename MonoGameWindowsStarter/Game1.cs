@@ -18,8 +18,13 @@ namespace MonoGameWindowsStarter
         SpriteBatch spriteBatch;
         Player player;
         CityModel cityModel;
+        EnemyModel enemyModel;
+        Grid grid;
         List<City> citiesList = new List<City>(); //to change later for spacial pattern
+        List<EnemyBullet> bulletList = new List<EnemyBullet>();
         MouseCursor mouseCursor;
+        double enemySpawnTimer = 0;
+        Random random;
 
         public Game1()
         {
@@ -27,11 +32,11 @@ namespace MonoGameWindowsStarter
             Content.RootDirectory = "Content";
             player = new Player(this);
             cityModel = new CityModel();
+            enemyModel = new EnemyModel();
             mouseCursor = new MouseCursor(this);
-            for (int i = 0; i < 4; i++)
-            {
-                citiesList.Add(new City(this, i * 300));
-            }
+
+            random = new Random();
+            
         }
 
         /// <summary>
@@ -46,7 +51,6 @@ namespace MonoGameWindowsStarter
             graphics.PreferredBackBufferWidth = 1080;
             graphics.PreferredBackBufferHeight = 720;
             graphics.ApplyChanges();
-            this.IsMouseVisible = true;
             base.Initialize();
         }
 
@@ -57,14 +61,20 @@ namespace MonoGameWindowsStarter
         protected override void LoadContent()
         {
             // Create a new SpriteBatch, which can be used to draw textures.
+            grid = new Grid(this);
             spriteBatch = new SpriteBatch(GraphicsDevice);
-            player.LoadContent(Content);
-            cityModel.LoadContent(Content);
-            mouseCursor.LoadContent(Content);
-
-            foreach(City city in citiesList)
+            for (int i = 0; i < 4; i++)
             {
-                city.LoadContent(cityModel);
+                citiesList.Add(new City(this, i * 300));
+            }
+            player.LoadContent(Content, grid);
+            cityModel.LoadContent(Content);
+            enemyModel.LoadContent(Content);
+            mouseCursor.LoadContent(Content);
+            
+            foreach (City city in citiesList)
+            {
+                city.LoadContent(cityModel, grid);
             }
             // TODO: use this.Content to load your game content here
         }
@@ -85,12 +95,29 @@ namespace MonoGameWindowsStarter
         /// <param name="gameTime">Provides a snapshot of timing values.</param>
         protected override void Update(GameTime gameTime)
         {
+
+            enemySpawnTimer += gameTime.ElapsedGameTime.TotalMilliseconds;
             if (GamePad.GetState(PlayerIndex.One).Buttons.Back == ButtonState.Pressed || Keyboard.GetState().IsKeyDown(Keys.Escape))
                 Exit();
 
             player.Update(gameTime);
             mouseCursor.Update(gameTime);
 
+            if(enemySpawnTimer > 2000)
+            {
+                enemySpawnTimer = 0;
+                bulletList.Add(new EnemyBullet(this, enemyModel, Content, random, grid));
+            }
+
+            for (int i = bulletList.Count - 1; i >= 0; i--)
+            {
+                bulletList[i].Update(gameTime);
+                if(!bulletList[i].IsVisible)
+                {
+                    bulletList.RemoveAt(i);
+                }
+            }
+            grid.CheckCollisions();
             base.Update(gameTime);
         }
 
@@ -108,6 +135,10 @@ namespace MonoGameWindowsStarter
             foreach(City city in citiesList)
             {
                 city.Draw(spriteBatch);
+            }
+            foreach(EnemyBullet bullet in bulletList)
+            {
+                bullet.Draw(spriteBatch);
             }
             spriteBatch.End();
             // TODO: Add your drawing code here

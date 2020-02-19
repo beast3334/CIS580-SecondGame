@@ -44,9 +44,11 @@
     <Compile Include="BoundingRectangle.cs" />
     <Compile Include="City.cs" />
     <Compile Include="CityModel.cs" />
+    <Compile Include="CollidableObject.cs" />
     <Compile Include="EnemyBullet.cs" />
     <Compile Include="EnemyModel.cs" />
     <Compile Include="Game1.cs" />
+    <Compile Include="Grid.cs" />
     <Compile Include="MouseCursor.cs" />
     <Compile Include="Player.cs" />
     <Compile Include="PlayerBullet.cs" />

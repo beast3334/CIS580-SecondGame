@@ -11,7 +11,7 @@ using Microsoft.Xna.Framework.Input;
 
 namespace MonoGameWindowsStarter
 {
-    public class Player
+    public class Player: CollidableObject
     {
         BoundingRectangle bounds;
         Game1 game;
@@ -20,17 +20,24 @@ namespace MonoGameWindowsStarter
         PlayerBulletModel playerBulletModel = new PlayerBulletModel();
         List<PlayerBullet> playerBullets = new List<PlayerBullet>();
         double shootLag = 0;
+        Grid grid;
         public Player(Game1 game)
         {
             this.game = game;
         }
-        public void LoadContent(ContentManager content)
+        public override Rectangle RectBounds()
+        {
+            return bounds;
+        }
+        public void LoadContent(ContentManager content, Grid grid)
         {
             texture = content.Load<Texture2D>("player");
+            this.grid = grid;
             bounds.Width = 16;
             bounds.Height = 50;
             bounds.X = game.GraphicsDevice.Viewport.Width / 2 - 16;
             bounds.Y = game.GraphicsDevice.Viewport.Height;
+            grid.Add(this, new Vector2(bounds.X, bounds.Y));
             playerBulletModel.LoadContent(content);
         }
         public void Update(GameTime gameTime)
@@ -47,7 +54,7 @@ namespace MonoGameWindowsStarter
             if(Mouse.GetState().LeftButton == ButtonState.Pressed && shootLag >= 500)
             {
                 shootLag = 0;
-                playerBullets.Add(new PlayerBullet(game, (int)bounds.X - 8, (int)bounds.Y - 25, rotation, new Vector2(Mouse.GetState().X, Mouse.GetState().Y),playerBulletModel));
+                playerBullets.Add(new PlayerBullet(game, (int)bounds.X - 8, (int)bounds.Y - 25, rotation, new Vector2(Mouse.GetState().X, Mouse.GetState().Y),playerBulletModel, grid));
             }
 
             //Bullets Update
@@ -59,6 +66,10 @@ namespace MonoGameWindowsStarter
                     playerBullets.RemoveAt(i);
                 }
             } 
+        }
+        public override void handleCollision(CollidableObject collidableObject)
+        {
+
         }
         public void Draw(SpriteBatch spriteBatch)
         {
