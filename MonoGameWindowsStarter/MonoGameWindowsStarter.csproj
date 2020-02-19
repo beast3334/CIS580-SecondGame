@@ -41,9 +41,20 @@
     <ApplicationManifest>app.manifest</ApplicationManifest>
   </PropertyGroup>
   <ItemGroup>
+    <Compile Include="BoundingRectangle.cs" />
+    <Compile Include="City.cs" />
+    <Compile Include="CityModel.cs" />
+    <Compile Include="EnemyBullet.cs" />
+    <Compile Include="EnemyModel.cs" />
     <Compile Include="Game1.cs" />
+    <Compile Include="MouseCursor.cs" />
+    <Compile Include="Player.cs" />
+    <Compile Include="PlayerBullet.cs" />
+    <Compile Include="PlayerBulletModel.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="StarterClass.cs" />
+    <Compile Include="Trail.cs" />
   </ItemGroup>
   <ItemGroup>
     <Reference Include="MonoGame.Framework">

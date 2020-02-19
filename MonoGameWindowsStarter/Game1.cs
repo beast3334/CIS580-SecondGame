@@ -1,7 +1,12 @@
-﻿using Microsoft.Xna.Framework;
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
-
 namespace MonoGameWindowsStarter
 {
     /// <summary>
@@ -11,11 +16,22 @@ namespace MonoGameWindowsStarter
     {
         GraphicsDeviceManager graphics;
         SpriteBatch spriteBatch;
+        Player player;
+        CityModel cityModel;
+        List<City> citiesList = new List<City>(); //to change later for spacial pattern
+        MouseCursor mouseCursor;
 
         public Game1()
         {
             graphics = new GraphicsDeviceManager(this);
             Content.RootDirectory = "Content";
+            player = new Player(this);
+            cityModel = new CityModel();
+            mouseCursor = new MouseCursor(this);
+            for (int i = 0; i < 4; i++)
+            {
+                citiesList.Add(new City(this, i * 300));
+            }
         }
 
         /// <summary>
@@ -27,7 +43,10 @@ namespace MonoGameWindowsStarter
         protected override void Initialize()
         {
             // TODO: Add your initialization logic here
-
+            graphics.PreferredBackBufferWidth = 1080;
+            graphics.PreferredBackBufferHeight = 720;
+            graphics.ApplyChanges();
+            this.IsMouseVisible = true;
             base.Initialize();
         }
 
@@ -39,7 +58,14 @@ namespace MonoGameWindowsStarter
         {
             // Create a new SpriteBatch, which can be used to draw textures.
             spriteBatch = new SpriteBatch(GraphicsDevice);
+            player.LoadContent(Content);
+            cityModel.LoadContent(Content);
+            mouseCursor.LoadContent(Content);
 
+            foreach(City city in citiesList)
+            {
+                city.LoadContent(cityModel);
+            }
             // TODO: use this.Content to load your game content here
         }
 
@@ -62,7 +88,8 @@ namespace MonoGameWindowsStarter
             if (GamePad.GetState(PlayerIndex.One).Buttons.Back == ButtonState.Pressed || Keyboard.GetState().IsKeyDown(Keys.Escape))
                 Exit();
 
-            // TODO: Add your update logic here
+            player.Update(gameTime);
+            mouseCursor.Update(gameTime);
 
             base.Update(gameTime);
         }
@@ -73,8 +100,16 @@ namespace MonoGameWindowsStarter
         /// <param name="gameTime">Provides a snapshot of timing values.</param>
         protected override void Draw(GameTime gameTime)
         {
-            GraphicsDevice.Clear(Color.CornflowerBlue);
+            GraphicsDevice.Clear(Color.TransparentBlack);
 
+            spriteBatch.Begin();
+            mouseCursor.Draw(spriteBatch);
+            player.Draw(spriteBatch);
+            foreach(City city in citiesList)
+            {
+                city.Draw(spriteBatch);
+            }
+            spriteBatch.End();
             // TODO: Add your drawing code here
 
             base.Draw(gameTime);
