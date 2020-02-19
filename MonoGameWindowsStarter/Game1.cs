@@ -95,7 +95,7 @@ namespace MonoGameWindowsStarter
         /// <param name="gameTime">Provides a snapshot of timing values.</param>
         protected override void Update(GameTime gameTime)
         {
-
+            grid.CheckCollisions();
             enemySpawnTimer += gameTime.ElapsedGameTime.TotalMilliseconds;
             if (GamePad.GetState(PlayerIndex.One).Buttons.Back == ButtonState.Pressed || Keyboard.GetState().IsKeyDown(Keys.Escape))
                 Exit();
@@ -117,7 +117,14 @@ namespace MonoGameWindowsStarter
                     bulletList.RemoveAt(i);
                 }
             }
-            grid.CheckCollisions();
+            for (int i = citiesList.Count - 1; i >= 0; i--)
+            {
+                if(!citiesList[i].IsVisible)
+                {
+                    citiesList.RemoveAt(i);
+                }
+            }
+
             base.Update(gameTime);
         }
 

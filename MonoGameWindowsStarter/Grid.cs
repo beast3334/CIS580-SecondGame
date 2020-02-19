@@ -12,7 +12,7 @@ namespace MonoGameWindowsStarter
     public class Grid
     {
         Game1 game;
-        int NUM_CELLS = 20, CELL_SIZE_X = 54 , CELL_SIZE_Y = 36;
+        int NUM_CELLS = 10, CELL_SIZE_X = 108 , CELL_SIZE_Y = 72;
         Dictionary<KeyValuePair<int,int>, List<CollidableObject>> grid;
         public Grid(Game1 game)
         {
@@ -50,20 +50,67 @@ namespace MonoGameWindowsStarter
 
         public void CheckCollisions()
         {
-            foreach(List<CollidableObject> objectList in grid.Values)
+            foreach(KeyValuePair<int,int> entry in grid.Keys)
             {
-                for (int i = 0; i < objectList.Count; i++)
+                List <CollidableObject>currentCell = grid[entry];
+                List<CollidableObject> leftCell;
+                List<CollidableObject> rightCell;
+                List<CollidableObject> topCell;
+                List<CollidableObject> bottomCell;
+                //left cell
+                if (grid.ContainsKey(new KeyValuePair<int, int>(entry.Key - 1, entry.Value)))
                 {
-                    for (int j = i + 1; j < objectList.Count; j++)
+                    leftCell = grid[new KeyValuePair<int, int>(entry.Key - 1, entry.Value)];
+                }
+                else
+                {
+                    leftCell = new List<CollidableObject>();
+                }
+                //right cell
+                if (grid.ContainsKey(new KeyValuePair<int, int>(entry.Key + 1, entry.Value)))
+                {
+                    rightCell = grid[new KeyValuePair<int, int>(entry.Key + 1, entry.Value)];
+                }
+                else
+                {
+                    rightCell = new List<CollidableObject>();
+                }
+                //top cell
+                if (grid.ContainsKey(new KeyValuePair<int, int>(entry.Key, entry.Value - 1)))
+                {
+                    topCell = grid[new KeyValuePair<int, int>(entry.Key, entry.Value - 1)];
+                }
+                else
+                {
+                    topCell = new List<CollidableObject>();
+                }
+                //bottom cell
+                if (grid.ContainsKey(new KeyValuePair<int, int>(entry.Key, entry.Value + 1)))
+                {
+                    bottomCell = grid[new KeyValuePair<int, int>(entry.Key, entry.Value + 1)];
+                }
+                else
+                {
+                    bottomCell = new List<CollidableObject>();
+                }
+
+                foreach(CollidableObject collidedObject in currentCell)
+                {
+                    foreach(CollidableObject collidableObjectleft in leftCell)
                     {
-                        Rectangle Rect1 = objectList[i].RectBounds();
-                        Rectangle Rect2 = objectList[j].RectBounds();
-                        if(Rect1.Intersects(Rect2))
-                        {
-                            objectList[i].handleCollision(objectList[j]);
-                            objectList[j].handleCollision(objectList[i]);
-                            
-                        }
+                        if()
+                    }
+                    foreach (CollidableObject collidableObjectright in rightCell)
+                    {
+
+                    }
+                    foreach (CollidableObject collidableObjecttop in topCell)
+                    {
+
+                    }
+                    foreach (CollidableObject collidableObjectbottom in bottomCell)
+                    {
+
                     }
                 }
             }

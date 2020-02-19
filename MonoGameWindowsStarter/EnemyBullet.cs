@@ -52,7 +52,11 @@ namespace MonoGameWindowsStarter
         {
             if(collidedObject.GetType() == typeof(PlayerBullet))
             {
-                isvisible = false;
+                PlayerBullet bullet = (PlayerBullet)collidedObject;
+                if(bullet.IsVisible)
+                {
+                    isvisible = false;
+                }
             }
 
         }

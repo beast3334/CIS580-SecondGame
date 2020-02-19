@@ -15,7 +15,7 @@ namespace MonoGameWindowsStarter
         Game1 game;
         Texture2D texture;
         BoundingRectangle bounds;
-        bool isVisible;
+        bool isVisible = true;
         public City(Game1 game, int xBounds)
         {
             this.game = game;
@@ -24,6 +24,10 @@ namespace MonoGameWindowsStarter
         public override Rectangle RectBounds()
         {
             return (Rectangle)bounds;
+        }
+        public bool IsVisible
+        {
+            get { return isVisible; }
         }
         public void LoadContent(CityModel cityModel, Grid grid)
         {
@@ -42,7 +46,12 @@ namespace MonoGameWindowsStarter
         {
             if(collidedObject.GetType() == typeof(EnemyBullet))
             {
-                isVisible = false;
+                EnemyBullet bullet = (EnemyBullet)collidedObject;
+                if(bullet.IsVisible)
+                {
+                    isVisible = false;
+                }
+
             }
         }
         public void Draw(SpriteBatch spriteBatch)
