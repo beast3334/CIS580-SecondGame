@@ -16,10 +16,16 @@ namespace MonoGameWindowsStarter
         Texture2D texture;
         BoundingRectangle bounds;
         bool isVisible = true;
-        public City(Game1 game, int xBounds)
+        Grid grid;
+        public City(Game1 game, int xBounds, CityModel model, ContentManager content, Grid grid)
         {
             this.game = game;
             bounds.X = xBounds;
+            LoadContent(model, grid, content);
+        }
+        public override bool visiblity()
+        {
+            return isVisible;
         }
         public override Rectangle RectBounds()
         {
@@ -29,8 +35,9 @@ namespace MonoGameWindowsStarter
         {
             get { return isVisible; }
         }
-        public void LoadContent(CityModel cityModel, Grid grid)
+        public void LoadContent(CityModel cityModel, Grid grid, ContentManager content)
         {
+            this.grid = grid;
             bounds.Width = 128;
             bounds.Height = 128;
             bounds.Y = game.GraphicsDevice.Viewport.Height - 128;

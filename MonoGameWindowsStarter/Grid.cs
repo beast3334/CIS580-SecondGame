@@ -12,7 +12,7 @@ namespace MonoGameWindowsStarter
     public class Grid
     {
         Game1 game;
-        int NUM_CELLS = 10, CELL_SIZE_X = 108 , CELL_SIZE_Y = 72;
+        int NUM_CELLS = 5, CELL_SIZE_X = 200 , CELL_SIZE_Y = 200;
         Dictionary<KeyValuePair<int,int>, List<CollidableObject>> grid;
         public Grid(Game1 game)
         {
@@ -33,9 +33,23 @@ namespace MonoGameWindowsStarter
                 grid[value].Add(data);
             }
         }
-        public void Remove(CollidableObject data, Vector2 bounds)
+        public void clean()
         {
-
+            foreach(List<CollidableObject> item in grid.Values)
+            {
+                for (int i = 0; i < item.Count; i++)
+                {
+                    if(!item[i].visiblity())
+                    {
+                        item.RemoveAt(i);
+                        i--;
+                    }
+                }
+            }
+        }
+       public void Reset()
+        {
+            grid.Clear();
         }
         public void Move(CollidableObject data, Vector2 oldbounds, Vector2 bounds)
         {
@@ -94,23 +108,50 @@ namespace MonoGameWindowsStarter
                     bottomCell = new List<CollidableObject>();
                 }
 
-                foreach(CollidableObject collidedObject in currentCell)
+                for (int i = 0; i < currentCell.Count; i++)
                 {
-                    foreach(CollidableObject collidableObjectleft in leftCell)
+                    CollidableObject collidedObject = currentCell[i];
+                    for (int j = i + 1; j < currentCell.Count - 1; j++)
                     {
-                        if()
+                        if (collidedObject.RectBounds().Intersects(currentCell[j].RectBounds()))
+                        {
+                            collidedObject.handleCollision(currentCell[j]);
+                            currentCell[j].handleCollision(collidedObject);
+                        }
                     }
-                    foreach (CollidableObject collidableObjectright in rightCell)
                     {
-
-                    }
-                    foreach (CollidableObject collidableObjecttop in topCell)
-                    {
-
-                    }
-                    foreach (CollidableObject collidableObjectbottom in bottomCell)
-                    {
-
+                        foreach (CollidableObject collidableObjectleft in leftCell)
+                        {
+                            if (collidedObject.RectBounds().Intersects(collidableObjectleft.RectBounds()))
+                            {
+                                collidedObject.handleCollision(collidableObjectleft);
+                                collidableObjectleft.handleCollision(collidedObject);
+                            }
+                        }
+                        foreach (CollidableObject collidableObjectright in rightCell)
+                        {
+                            if (collidedObject.RectBounds().Intersects(collidableObjectright.RectBounds()))
+                            {
+                                collidedObject.handleCollision(collidableObjectright);
+                                collidableObjectright.handleCollision(collidedObject);
+                            }
+                        }
+                        foreach (CollidableObject collidableObjecttop in topCell)
+                        {
+                            if (collidedObject.RectBounds().Intersects(collidableObjecttop.RectBounds()))
+                            {
+                                collidedObject.handleCollision(collidableObjecttop);
+                                collidableObjecttop.handleCollision(collidedObject);
+                            }
+                        }
+                        foreach (CollidableObject collidableObjectbottom in bottomCell)
+                        {
+                            if (collidedObject.RectBounds().Intersects(collidableObjectbottom.RectBounds()))
+                            {
+                                collidedObject.handleCollision(collidableObjectbottom);
+                                collidableObjectbottom.handleCollision(collidedObject);
+                            }
+                        }
                     }
                 }
             }

@@ -22,6 +22,7 @@ namespace MonoGameWindowsStarter
 
         public CityModel()
         {
+            
         }
         public void LoadContent(ContentManager content)
         {

@@ -25,6 +25,10 @@ namespace MonoGameWindowsStarter
         public bool IsVisible
         { get { return isvisible; } }
 
+        public override bool visiblity()
+        {
+            return isvisible;
+        }
         public EnemyBullet(Game1 game, EnemyModel enemyModel, ContentManager content, Random random, Grid grid)
         {
             this.game = game;
@@ -53,6 +57,7 @@ namespace MonoGameWindowsStarter
             if(collidedObject.GetType() == typeof(PlayerBullet))
             {
                 PlayerBullet bullet = (PlayerBullet)collidedObject;
+                game.score += 10;
                 if(bullet.IsVisible)
                 {
                     isvisible = false;

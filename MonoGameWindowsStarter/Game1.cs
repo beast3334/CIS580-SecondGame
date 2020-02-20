@@ -7,6 +7,7 @@ using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
+using Microsoft.Xna.Framework.Audio;
 namespace MonoGameWindowsStarter
 {
     /// <summary>
@@ -23,6 +24,10 @@ namespace MonoGameWindowsStarter
         List<City> citiesList = new List<City>(); //to change later for spacial pattern
         List<EnemyBullet> bulletList = new List<EnemyBullet>();
         MouseCursor mouseCursor;
+        bool playing = true;
+        SpriteFont scoreFont;
+        SpriteFont gameOverFont;
+        public int score;
         double enemySpawnTimer = 0;
         Random random;
 
@@ -63,18 +68,16 @@ namespace MonoGameWindowsStarter
             // Create a new SpriteBatch, which can be used to draw textures.
             grid = new Grid(this);
             spriteBatch = new SpriteBatch(GraphicsDevice);
-            for (int i = 0; i < 4; i++)
-            {
-                citiesList.Add(new City(this, i * 300));
-            }
+            
             player.LoadContent(Content, grid);
             cityModel.LoadContent(Content);
             enemyModel.LoadContent(Content);
             mouseCursor.LoadContent(Content);
-            
-            foreach (City city in citiesList)
+            scoreFont = Content.Load<SpriteFont>("scoreFont");
+            gameOverFont = Content.Load<SpriteFont>("gameOverFont");
+            for (int i = 0; i < 4; i++)
             {
-                city.LoadContent(cityModel, grid);
+                citiesList.Add(new City(this, i * 300, cityModel, Content, grid));
             }
             // TODO: use this.Content to load your game content here
         }
@@ -95,36 +98,61 @@ namespace MonoGameWindowsStarter
         /// <param name="gameTime">Provides a snapshot of timing values.</param>
         protected override void Update(GameTime gameTime)
         {
-            grid.CheckCollisions();
-            enemySpawnTimer += gameTime.ElapsedGameTime.TotalMilliseconds;
-            if (GamePad.GetState(PlayerIndex.One).Buttons.Back == ButtonState.Pressed || Keyboard.GetState().IsKeyDown(Keys.Escape))
-                Exit();
-
-            player.Update(gameTime);
-            mouseCursor.Update(gameTime);
-
-            if(enemySpawnTimer > 2000)
+            if (playing)
             {
-                enemySpawnTimer = 0;
-                bulletList.Add(new EnemyBullet(this, enemyModel, Content, random, grid));
-            }
 
-            for (int i = bulletList.Count - 1; i >= 0; i--)
-            {
-                bulletList[i].Update(gameTime);
-                if(!bulletList[i].IsVisible)
+                grid.CheckCollisions();
+                enemySpawnTimer += gameTime.ElapsedGameTime.TotalMilliseconds;
+                if (GamePad.GetState(PlayerIndex.One).Buttons.Back == ButtonState.Pressed || Keyboard.GetState().IsKeyDown(Keys.Escape))
+                    Exit();
+
+                player.Update(gameTime);
+                mouseCursor.Update(gameTime);
+
+                if (enemySpawnTimer > 2000)
                 {
-                    bulletList.RemoveAt(i);
+                    enemySpawnTimer = 0;
+                    bulletList.Add(new EnemyBullet(this, enemyModel, Content, random, grid));
+                }
+
+                for (int i = bulletList.Count - 1; i >= 0; i--)
+                {
+                    bulletList[i].Update(gameTime);
+                    if (!bulletList[i].IsVisible)
+                    {
+                        bulletList.RemoveAt(i);
+                    }
+                }
+                if (citiesList.Count == 0)
+                {
+                    playing = false;
+                }
+                for (int i = citiesList.Count - 1; i >= 0; i--)
+                {
+                    if (!citiesList[i].IsVisible)
+                    {
+                        citiesList.RemoveAt(i);
+                    }
+                }
+                grid.CheckCollisions();
+                grid.clean();
+            }
+            else
+            {
+                score = 0;
+                int i = 0;
+                bulletList.Clear();
+                grid.Reset();
+                while(citiesList.Count < 5)
+                {
+                    citiesList.Add(new City(this, i * 300,cityModel,Content, grid));
+                    i++;
+                }
+                if (Keyboard.GetState().IsKeyDown(Keys.Space))
+                {
+                    playing = true;
                 }
             }
-            for (int i = citiesList.Count - 1; i >= 0; i--)
-            {
-                if(!citiesList[i].IsVisible)
-                {
-                    citiesList.RemoveAt(i);
-                }
-            }
-
             base.Update(gameTime);
         }
 
@@ -135,20 +163,26 @@ namespace MonoGameWindowsStarter
         protected override void Draw(GameTime gameTime)
         {
             GraphicsDevice.Clear(Color.TransparentBlack);
-
             spriteBatch.Begin();
-            mouseCursor.Draw(spriteBatch);
-            player.Draw(spriteBatch);
-            foreach(City city in citiesList)
+            if (playing)
             {
-                city.Draw(spriteBatch);
+                spriteBatch.DrawString(scoreFont, "Score: " + score, new Vector2(0, 0), Color.White);
+                mouseCursor.Draw(spriteBatch);
+                player.Draw(spriteBatch);
+                foreach (City city in citiesList)
+                {
+                    city.Draw(spriteBatch);
+                }
+                foreach (EnemyBullet bullet in bulletList)
+                {
+                    bullet.Draw(spriteBatch);
+                }
             }
-            foreach(EnemyBullet bullet in bulletList)
+            else
             {
-                bullet.Draw(spriteBatch);
+                spriteBatch.DrawString(gameOverFont, "Game Over: Press Spacebar to Play Again", new Vector2(400, 360), Color.White);
             }
             spriteBatch.End();
-            // TODO: Add your drawing code here
 
             base.Draw(gameTime);
         }

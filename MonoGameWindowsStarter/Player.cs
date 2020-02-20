@@ -7,7 +7,7 @@ using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
-
+using Microsoft.Xna.Framework.Audio;
 
 namespace MonoGameWindowsStarter
 {
@@ -21,6 +21,7 @@ namespace MonoGameWindowsStarter
         List<PlayerBullet> playerBullets = new List<PlayerBullet>();
         double shootLag = 0;
         Grid grid;
+        SoundEffect explosion;
         public Player(Game1 game)
         {
             this.game = game;
@@ -28,6 +29,10 @@ namespace MonoGameWindowsStarter
         public override Rectangle RectBounds()
         {
             return bounds;
+        }
+        public override bool visiblity()
+        {
+            return true;
         }
         public void LoadContent(ContentManager content, Grid grid)
         {
@@ -39,6 +44,7 @@ namespace MonoGameWindowsStarter
             bounds.Y = game.GraphicsDevice.Viewport.Height;
             grid.Add(this, new Vector2(bounds.X, bounds.Y));
             playerBulletModel.LoadContent(content);
+            explosion = content.Load<SoundEffect>("Explosion2");
         }
         public void Update(GameTime gameTime)
         {
@@ -54,7 +60,7 @@ namespace MonoGameWindowsStarter
             if(Mouse.GetState().LeftButton == ButtonState.Pressed && shootLag >= 500)
             {
                 shootLag = 0;
-                playerBullets.Add(new PlayerBullet(game, (int)bounds.X - 8, (int)bounds.Y - 25, rotation, new Vector2(Mouse.GetState().X, Mouse.GetState().Y),playerBulletModel, grid));
+                playerBullets.Add(new PlayerBullet(game, (int)bounds.X - 8, (int)bounds.Y - 25, rotation, new Vector2(Mouse.GetState().X, Mouse.GetState().Y),playerBulletModel, grid, explosion));
             }
 
             //Bullets Update

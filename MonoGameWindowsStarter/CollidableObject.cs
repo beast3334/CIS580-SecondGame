@@ -14,6 +14,7 @@ namespace MonoGameWindowsStarter
     {
         public abstract void handleCollision(CollidableObject collidableObject);
         public abstract Rectangle RectBounds();
+        public abstract bool visiblity();
 
     }
 }

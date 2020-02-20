@@ -7,7 +7,7 @@ using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
-
+using Microsoft.Xna.Framework.Audio;
 namespace MonoGameWindowsStarter
 {
     public class PlayerBullet: CollidableObject
@@ -21,6 +21,7 @@ namespace MonoGameWindowsStarter
         bool isVisible = true;
         bool exploded = false;
         Grid grid;
+        SoundEffect explosion;
         TimeSpan animationTimer, explodedTimer, trailTimer;
         const int FRAME_WIDTH = 296 , FRAME_HEIGHT = 260, ANIMATION_FRAME_RATE = 124;
         int frame, state;
@@ -34,7 +35,11 @@ namespace MonoGameWindowsStarter
         {
             return (Rectangle)bounds;
         }
-        public PlayerBullet(Game1 game, int xBounds, int yBounds, float rotation, Vector2 destination,  PlayerBulletModel playerBulletModel, Grid grid)
+        public override bool visiblity()
+        {
+            return isVisible;
+        }
+        public PlayerBullet(Game1 game, int xBounds, int yBounds, float rotation, Vector2 destination,  PlayerBulletModel playerBulletModel, Grid grid, SoundEffect explosion)
         {
             this.game = game;
             this.destination = destination;
@@ -42,6 +47,7 @@ namespace MonoGameWindowsStarter
             bounds.X = xBounds;
             bounds.Y = yBounds;
             this.grid = grid;
+            this.explosion = explosion;
             LoadContent(playerBulletModel);
         }
         public void LoadContent(PlayerBulletModel playerBulletModel)
@@ -75,6 +81,7 @@ namespace MonoGameWindowsStarter
                 if (Vector2.Distance(newDestination, destination) <= 20)
                 {
                     exploded = true;
+                    explosion.Play();
                     bounds.Y -= 64;
                     bounds.X -= 64;
                     bounds.Width = 128;
@@ -113,6 +120,7 @@ namespace MonoGameWindowsStarter
         {
             if(collidedObject.GetType() == typeof(EnemyBullet))
             {
+                explosion.Play();
                 exploded = true;
                 bounds.Width = 128;
                 bounds.Height = 128;
